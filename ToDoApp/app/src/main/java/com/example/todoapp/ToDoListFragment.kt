@@ -16,10 +16,13 @@ class ToDoListFragment : Fragment() {
     private val binding
         get() = _binding!!
 
+    private val editItemDialogFragment = EditToDoItemFragment(saveItemChanges = ::updateItem)
+
     private val adapter: ToDoListAdapter by lazy {
         ToDoListAdapter(
-            onToDoItemClicked = {},
-            deleteItem = ::deleteItem
+            onToDoItemClicked = ::showEditItemDialog,
+            deleteItem = ::deleteItem,
+            editItemDialogFragment = editItemDialogFragment
         ).apply {
             submitList(toDoList)
         }
@@ -68,5 +71,18 @@ class ToDoListFragment : Fragment() {
     private fun deleteItem(position: Int){
         toDoList.removeAt(position)
         adapter.notifyItemRemoved(position)
+    }
+
+    private fun showEditItemDialog(item: ToDoItem, dialog: EditToDoItemFragment) {
+        val bundle = Bundle()
+        bundle.putParcelable("TO_DO_ITEM", item)
+        dialog.arguments = bundle
+        dialog.show(childFragmentManager, dialog.tag)
+    }
+
+    private fun updateItem(item: ToDoItem) {
+        val position = toDoList.indexOfFirst { it.id == item.id }
+        toDoList[position] = item
+        adapter.notifyItemChanged(position)
     }
 }

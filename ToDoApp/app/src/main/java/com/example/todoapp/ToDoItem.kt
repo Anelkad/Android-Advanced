@@ -1,10 +1,15 @@
 package com.example.todoapp
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class ToDoItem(
     val id: Int = currentId++,
-    val title: String,
+    var title: String,
     var status: Status = Status.PENDING
-){
+): Parcelable
+{
     companion object {
         var currentId = 1
     }

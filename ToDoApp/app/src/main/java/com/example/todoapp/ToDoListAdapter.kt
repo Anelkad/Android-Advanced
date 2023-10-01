@@ -1,6 +1,7 @@
 package com.example.todoapp
 
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
@@ -8,8 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.databinding.ItemToDoBinding
 
 class ToDoListAdapter(
-    private val onToDoItemClicked: (ToDoItem) -> Unit,
-    private val deleteItem: (Int) -> Unit
+    private val onToDoItemClicked: (ToDoItem, EditToDoItemFragment) -> Unit,
+    private val deleteItem: (Int) -> Unit,
+    private val editItemDialogFragment: EditToDoItemFragment
 ) : ListAdapter<ToDoItem, ToDoListAdapter.ViewHolder>(ToDoListDiffUtilCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -31,15 +33,16 @@ class ToDoListAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         init {
-            with(binding){
-                root.setOnClickListener {
-                    onToDoItemClicked.invoke(getItem(adapterPosition))
-                }
+            with(binding) {
                 tvTitle.setOnClickListener {
                     changeStatus(adapterPosition)
                 }
                 ibDelete.setOnClickListener {
                     deleteItem.invoke(adapterPosition)
+                }
+                ibEdit.setOnClickListener {
+                    onToDoItemClicked.invoke(getItem(adapterPosition), editItemDialogFragment)
+                    Log.d("qwerty", currentList.joinToString(", "))
                 }
                 checkbox.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {
@@ -60,6 +63,7 @@ class ToDoListAdapter(
                     binding.tvTitle.setTextColor(Color.GRAY)
                     binding.checkbox.isChecked = true
                 }
+
                 ToDoItem.Status.PENDING -> binding.tvTitle.setTextColor(Color.BLACK)
             }
             binding.tvTitle.text = toDoItem.title
