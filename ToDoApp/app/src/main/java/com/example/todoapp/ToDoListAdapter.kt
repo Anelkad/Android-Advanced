@@ -1,7 +1,6 @@
 package com.example.todoapp
 
 import android.graphics.Color
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
@@ -11,8 +10,10 @@ import com.example.todoapp.databinding.ItemToDoBinding
 class ToDoListAdapter(
     private val onToDoItemClicked: (ToDoItem, EditToDoItemFragment) -> Unit,
     private val deleteItem: (Int) -> Unit,
-    private val editItemDialogFragment: EditToDoItemFragment
-) : ListAdapter<ToDoItem, ToDoListAdapter.ViewHolder>(ToDoListDiffUtilCallback()) {
+    private val editItemDialogFragment: EditToDoItemFragment,
+    private val swipeItems: (Int, Int) -> Unit
+) : ListAdapter<ToDoItem, ToDoListAdapter.ViewHolder>(ToDoListDiffUtilCallback()),
+    ItemTouchHelperAdapter {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
@@ -42,7 +43,6 @@ class ToDoListAdapter(
                 }
                 ibEdit.setOnClickListener {
                     onToDoItemClicked.invoke(getItem(adapterPosition), editItemDialogFragment)
-                    Log.d("qwerty", currentList.joinToString(", "))
                 }
                 checkbox.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {
@@ -58,7 +58,7 @@ class ToDoListAdapter(
 
         fun bind(toDoItem: ToDoItem) {
             when (toDoItem.status) {
-                ToDoItem.Status.IN_PROGRESS -> binding.tvTitle.setTextColor(Color.GREEN)
+                ToDoItem.Status.IN_PROGRESS -> binding.tvTitle.setTextColor(Color.rgb(79,176,67))
                 ToDoItem.Status.COMPLETED -> {
                     binding.tvTitle.setTextColor(Color.GRAY)
                     binding.checkbox.isChecked = true
@@ -78,6 +78,12 @@ class ToDoListAdapter(
             }
             getItem(position).status = status
             notifyItemChanged(position)
+        }
+    }
+
+    override fun onItemMove(fromPosition: Int, toPosition: Int) {
+        if (fromPosition in currentList.indices && toPosition in currentList.indices) {
+            swipeItems(fromPosition,toPosition)
         }
     }
 }

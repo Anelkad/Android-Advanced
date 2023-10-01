@@ -13,12 +13,13 @@ class EditToDoItemFragment(
 ) : BottomSheetDialogFragment() {
 
     private var binding: FragmentEditToDoItemBinding? = null
-
+    private var toDoItem: ToDoItem? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentEditToDoItemBinding.inflate(inflater, container, false)
+        toDoItem = arguments?.getParcelable(IntentConstants.TO_DO_ITEM)
         return binding?.root
     }
 
@@ -29,20 +30,19 @@ class EditToDoItemFragment(
 
     override fun onResume() {
         super.onResume()
-        val item = arguments?.getParcelable<ToDoItem>("TO_DO_ITEM")
+        toDoItem = arguments?.getParcelable<ToDoItem>(IntentConstants.TO_DO_ITEM)
         binding?.apply {
-            editText.setText(item?.title)
+            editText.setText(toDoItem?.title)
         }
     }
 
     private fun bindViews() {
-        val item = arguments?.getParcelable<ToDoItem>("TO_DO_ITEM")
         binding?.apply {
-            editText.setText(item?.title)
+            editText.setText(toDoItem?.title)
         }
         binding?.btnSave?.setOnClickListener {
             if (binding?.editText?.text?.toString() != null) {
-                item?.copy(
+                toDoItem?.copy(
                     title = binding?.editText?.text.toString()
                 )?.let { changedItem ->
                     saveItemChanges(changedItem)

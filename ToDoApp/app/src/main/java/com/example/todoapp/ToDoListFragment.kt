@@ -5,7 +5,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ItemTouchHelper
 import com.example.todoapp.databinding.FragmentToDoListBinding
+import java.util.Collections
 
 class ToDoListFragment : Fragment() {
     companion object {
@@ -22,7 +24,8 @@ class ToDoListFragment : Fragment() {
         ToDoListAdapter(
             onToDoItemClicked = ::showEditItemDialog,
             deleteItem = ::deleteItem,
-            editItemDialogFragment = editItemDialogFragment
+            editItemDialogFragment = editItemDialogFragment,
+            swipeItems = ::swipeItems
         ).apply {
             submitList(toDoList)
         }
@@ -66,6 +69,11 @@ class ToDoListFragment : Fragment() {
             }
             binding.editText.text.clear()
         }
+
+        val itemTouchHelperCallback = ItemMoveCallback(adapter)
+        val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
+        itemTouchHelper.attachToRecyclerView(binding.rvList)
+
     }
 
     private fun deleteItem(position: Int){
@@ -75,7 +83,7 @@ class ToDoListFragment : Fragment() {
 
     private fun showEditItemDialog(item: ToDoItem, dialog: EditToDoItemFragment) {
         val bundle = Bundle()
-        bundle.putParcelable("TO_DO_ITEM", item)
+        bundle.putParcelable(IntentConstants.TO_DO_ITEM, item)
         dialog.arguments = bundle
         dialog.show(childFragmentManager, dialog.tag)
     }
@@ -84,5 +92,10 @@ class ToDoListFragment : Fragment() {
         val position = toDoList.indexOfFirst { it.id == item.id }
         toDoList[position] = item
         adapter.notifyItemChanged(position)
+    }
+
+    private fun swipeItems(fromPosition: Int, toPosition: Int){
+        Collections.swap(toDoList, fromPosition, toPosition)
+        adapter.notifyItemMoved(fromPosition, toPosition)
     }
 }
