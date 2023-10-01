@@ -1,10 +1,13 @@
 package com.example.todoapp
 
 data class ToDoItem(
-    val id: Int,
+    val id: Int = currentId++,
     val title: String,
-    val status: Status = Status.PENDING
+    var status: Status = Status.PENDING
 ){
+    companion object {
+        var currentId = 1
+    }
     enum class Status {
         COMPLETED, IN_PROGRESS, PENDING;
     }

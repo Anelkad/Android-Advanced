@@ -8,24 +8,65 @@ import android.view.ViewGroup
 import com.example.todoapp.databinding.FragmentToDoListBinding
 
 class ToDoListFragment : Fragment() {
+    companion object {
+        fun newInstance() = ToDoListFragment()
+    }
 
     var _binding: FragmentToDoListBinding? = null
     private val binding
         get() = _binding!!
 
-    companion object {
-        fun newInstance() = ToDoListFragment()
+    private val adapter: ToDoListAdapter by lazy {
+        ToDoListAdapter(
+            onToDoItemClicked = {},
+            deleteItem = ::deleteItem
+        ).apply {
+            submitList(toDoList)
+        }
     }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private var toDoList = mutableListOf(
+        ToDoItem(
+            title = "to do 1",
+            status = ToDoItem.Status.IN_PROGRESS
+        ),
+        ToDoItem(
+            title = "to do 2",
+            status = ToDoItem.Status.PENDING
+        )
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_to_do_list, container, false)
+    ): View {
+        _binding = FragmentToDoListBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        bindViews()
+    }
+
+    private fun bindViews() {
+        binding.rvList.adapter = adapter
+
+        binding.btnAddToDo.setOnClickListener {
+            if (binding.editText.text.isNotEmpty()) {
+                toDoList.add(
+                    ToDoItem(
+                        title = binding.editText.text.toString(),
+                        status = ToDoItem.Status.PENDING
+                    )
+                )
+                adapter.notifyItemInserted(toDoList.lastIndex)
+            }
+            binding.editText.text.clear()
+        }
+    }
+
+    private fun deleteItem(position: Int){
+        toDoList.removeAt(position)
+        adapter.notifyItemRemoved(position)
+    }
 }
