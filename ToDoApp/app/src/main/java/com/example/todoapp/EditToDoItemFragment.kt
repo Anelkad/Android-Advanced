@@ -5,15 +5,27 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import com.example.todoapp.databinding.FragmentEditToDoItemBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class EditToDoItemFragment(
-    private val saveItemChanges: (ToDoItem) -> Unit
+
 ) : BottomSheetDialogFragment() {
+
+    companion object {
+        private const val ARG_TO_DO_ITEM = "toDoItem"
+
+        fun newInstance(toDoItem: ToDoItem) = EditToDoItemFragment().apply {
+            arguments = bundleOf(IntentConstants.TO_DO_ITEM to toDoItem)
+        }
+    }
 
     private var binding: FragmentEditToDoItemBinding? = null
     private var toDoItem: ToDoItem? = null
+
+    var saveItemChanges: ((ToDoItem) -> Unit)? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -36,6 +48,11 @@ class EditToDoItemFragment(
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        saveItemChanges = null
+    }
+
     private fun bindViews() {
         binding?.apply {
             editText.setText(toDoItem?.title)
@@ -45,7 +62,7 @@ class EditToDoItemFragment(
                 toDoItem?.copy(
                     title = binding?.editText?.text.toString()
                 )?.let { changedItem ->
-                    saveItemChanges(changedItem)
+                    saveItemChanges?.invoke(changedItem)
                 }
             }
             dismiss()

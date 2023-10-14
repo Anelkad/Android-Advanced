@@ -3,14 +3,14 @@ package com.example.todoapp
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.databinding.ItemToDoBinding
 
 class ToDoListAdapter(
-    private val onToDoItemClicked: (ToDoItem, EditToDoItemFragment) -> Unit,
+    private val onToDoItemClicked: (ToDoItem) -> Unit,
     private val deleteItem: (Int) -> Unit,
-    private val editItemDialogFragment: EditToDoItemFragment,
     private val swipeItems: (Int, Int) -> Unit
 ) : ListAdapter<ToDoItem, ToDoListAdapter.ViewHolder>(ToDoListDiffUtilCallback()),
     ItemTouchHelperAdapter {
@@ -33,6 +33,8 @@ class ToDoListAdapter(
         private val binding: ItemToDoBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
+        private val context = binding.root.context
+
         init {
             with(binding) {
                 tvTitle.setOnClickListener {
@@ -42,7 +44,7 @@ class ToDoListAdapter(
                     deleteItem.invoke(adapterPosition)
                 }
                 ibEdit.setOnClickListener {
-                    onToDoItemClicked.invoke(getItem(adapterPosition), editItemDialogFragment)
+                    onToDoItemClicked.invoke(getItem(adapterPosition))
                 }
                 checkbox.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {
@@ -58,7 +60,7 @@ class ToDoListAdapter(
 
         fun bind(toDoItem: ToDoItem) {
             when (toDoItem.status) {
-                ToDoItem.Status.IN_PROGRESS -> binding.tvTitle.setTextColor(Color.rgb(79,176,67))
+                ToDoItem.Status.IN_PROGRESS -> binding.tvTitle.setTextColor(ContextCompat.getColor(context, R.color.green))
                 ToDoItem.Status.COMPLETED -> {
                     binding.tvTitle.setTextColor(Color.GRAY)
                     binding.checkbox.isChecked = true

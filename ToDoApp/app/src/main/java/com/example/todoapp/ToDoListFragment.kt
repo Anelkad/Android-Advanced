@@ -14,17 +14,14 @@ class ToDoListFragment : Fragment() {
         fun newInstance() = ToDoListFragment()
     }
 
-    var _binding: FragmentToDoListBinding? = null
+    private var _binding: FragmentToDoListBinding? = null
     private val binding
         get() = _binding!!
-
-    private val editItemDialogFragment = EditToDoItemFragment(saveItemChanges = ::updateItem)
 
     private val adapter: ToDoListAdapter by lazy {
         ToDoListAdapter(
             onToDoItemClicked = ::showEditItemDialog,
             deleteItem = ::deleteItem,
-            editItemDialogFragment = editItemDialogFragment,
             swipeItems = ::swipeItems
         ).apply {
             submitList(toDoList)
@@ -55,37 +52,41 @@ class ToDoListFragment : Fragment() {
     }
 
     private fun bindViews() {
-        binding.rvList.adapter = adapter
+        with(binding) {
+            rvList.adapter = adapter
 
-        binding.btnAddToDo.setOnClickListener {
-            if (binding.editText.text.isNotEmpty()) {
-                toDoList.add(
-                    ToDoItem(
-                        title = binding.editText.text.toString(),
-                        status = ToDoItem.Status.PENDING
+            btnAddToDo.setOnClickListener {
+                if (editText.text.isNotEmpty()) {
+                    toDoList.add(
+                        ToDoItem(
+                            title = editText.text.toString(),
+                            status = ToDoItem.Status.PENDING
+                        )
                     )
-                )
-                adapter.notifyItemInserted(toDoList.lastIndex)
+                    adapter.notifyItemInserted(toDoList.lastIndex)
+                }
+                editText.text.clear()
             }
-            binding.editText.text.clear()
+
+            val itemTouchHelperCallback = ItemMoveCallback(adapter)
+            val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
+            itemTouchHelper.attachToRecyclerView(binding.rvList)
         }
-
-        val itemTouchHelperCallback = ItemMoveCallback(adapter)
-        val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
-        itemTouchHelper.attachToRecyclerView(binding.rvList)
-
     }
 
-    private fun deleteItem(position: Int){
+    private fun deleteItem(position: Int) {
         toDoList.removeAt(position)
         adapter.notifyItemRemoved(position)
     }
 
-    private fun showEditItemDialog(item: ToDoItem, dialog: EditToDoItemFragment) {
-        val bundle = Bundle()
-        bundle.putParcelable(IntentConstants.TO_DO_ITEM, item)
-        dialog.arguments = bundle
-        dialog.show(childFragmentManager, dialog.tag)
+    private fun showEditItemDialog(item: ToDoItem) {
+        EditToDoItemFragment.newInstance(item).apply {
+            saveItemChanges = {
+                updateItem(it)
+            }
+        }.also {
+            it.show(childFragmentManager, it.tag)
+        }
     }
 
     private fun updateItem(item: ToDoItem) {
@@ -94,7 +95,7 @@ class ToDoListFragment : Fragment() {
         adapter.notifyItemChanged(position)
     }
 
-    private fun swipeItems(fromPosition: Int, toPosition: Int){
+    private fun swipeItems(fromPosition: Int, toPosition: Int) {
         Collections.swap(toDoList, fromPosition, toPosition)
         adapter.notifyItemMoved(fromPosition, toPosition)
     }
