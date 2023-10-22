@@ -11,6 +11,7 @@ import com.example.todoapp.databinding.ItemToDoBinding
 class ToDoListAdapter(
     private val onToDoItemClicked: (ToDoItem) -> Unit,
     private val deleteItem: (Int) -> Unit,
+    private val changeStatus: (Int) -> Unit,
     private val swipeItems: (Int, Int) -> Unit
 ) : ListAdapter<ToDoItem, ToDoListAdapter.ViewHolder>(ToDoListDiffUtilCallback()),
     ItemTouchHelperAdapter {
@@ -38,20 +39,20 @@ class ToDoListAdapter(
         init {
             with(binding) {
                 tvTitle.setOnClickListener {
-                    changeStatus(adapterPosition)
+                    changeStatus.invoke(getItem(bindingAdapterPosition).id)
                 }
                 ibDelete.setOnClickListener {
-                    deleteItem.invoke(adapterPosition)
+                    deleteItem.invoke(getItem(bindingAdapterPosition).id)
                 }
                 ibEdit.setOnClickListener {
-                    onToDoItemClicked.invoke(getItem(adapterPosition))
+                    onToDoItemClicked.invoke(getItem(bindingAdapterPosition))
                 }
                 checkbox.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {
-                        getItem(adapterPosition).status = ToDoItem.Status.COMPLETED
+                        getItem(bindingAdapterPosition).status = ToDoItem.Status.COMPLETED
                         binding.tvTitle.setTextColor(Color.GRAY)
                     } else {
-                        getItem(adapterPosition).status = ToDoItem.Status.PENDING
+                        getItem(bindingAdapterPosition).status = ToDoItem.Status.PENDING
                         binding.tvTitle.setTextColor(Color.BLACK)
                     }
                 }
@@ -70,16 +71,6 @@ class ToDoListAdapter(
             }
             binding.tvTitle.text = toDoItem.title
             binding.checkbox.isChecked = toDoItem.status == ToDoItem.Status.COMPLETED
-        }
-
-        private fun changeStatus(position: Int) {
-            val status = when (getItem(position).status) {
-                ToDoItem.Status.IN_PROGRESS -> ToDoItem.Status.COMPLETED
-                ToDoItem.Status.PENDING -> ToDoItem.Status.IN_PROGRESS
-                else -> ToDoItem.Status.COMPLETED
-            }
-            getItem(position).status = status
-            notifyItemChanged(position)
         }
     }
 

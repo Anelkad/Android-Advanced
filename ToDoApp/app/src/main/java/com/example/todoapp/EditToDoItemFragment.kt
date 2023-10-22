@@ -1,7 +1,6 @@
 package com.example.todoapp
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,8 +13,6 @@ class EditToDoItemFragment(
 ) : BottomSheetDialogFragment() {
 
     companion object {
-        private const val ARG_TO_DO_ITEM = "toDoItem"
-
         fun newInstance(toDoItem: ToDoItem) = EditToDoItemFragment().apply {
             arguments = bundleOf(IntentConstants.TO_DO_ITEM to toDoItem)
         }
@@ -40,32 +37,24 @@ class EditToDoItemFragment(
         bindViews()
     }
 
-    override fun onResume() {
-        super.onResume()
-        toDoItem = arguments?.getParcelable<ToDoItem>(IntentConstants.TO_DO_ITEM)
-        binding?.apply {
-            editText.setText(toDoItem?.title)
-        }
-    }
-
     override fun onDestroy() {
         super.onDestroy()
-        saveItemChanges = null
+        saveItemChanges = null // чтобы не было утечки памяти
     }
 
     private fun bindViews() {
         binding?.apply {
             editText.setText(toDoItem?.title)
-        }
-        binding?.btnSave?.setOnClickListener {
-            if (binding?.editText?.text?.toString() != null) {
-                toDoItem?.copy(
-                    title = binding?.editText?.text.toString()
-                )?.let { changedItem ->
-                    saveItemChanges?.invoke(changedItem)
+            btnSave.setOnClickListener {
+                if (editText.text?.toString() != null) {
+                    toDoItem?.copy(
+                        title = editText.text.toString()
+                    )?.let { changedItem ->
+                        saveItemChanges?.invoke(changedItem)
+                    }
                 }
+                dismiss()
             }
-            dismiss()
         }
     }
 

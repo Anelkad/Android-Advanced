@@ -1,10 +1,10 @@
 package com.example.todoapp
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.example.todoapp.databinding.FragmentToDoListBinding
 import java.util.Collections
@@ -22,6 +22,7 @@ class ToDoListFragment : Fragment() {
         ToDoListAdapter(
             onToDoItemClicked = ::showEditItemDialog,
             deleteItem = ::deleteItem,
+            changeStatus = ::changeStatus,
             swipeItems = ::swipeItems
         ).apply {
             submitList(toDoList)
@@ -57,13 +58,14 @@ class ToDoListFragment : Fragment() {
 
             btnAddToDo.setOnClickListener {
                 if (editText.text.isNotEmpty()) {
-                    toDoList.add(
+                    val newList = adapter.currentList.toMutableList()
+                    newList.add(
                         ToDoItem(
                             title = editText.text.toString(),
                             status = ToDoItem.Status.PENDING
                         )
                     )
-                    adapter.notifyItemInserted(toDoList.lastIndex)
+                    adapter.submitList(newList)
                 }
                 editText.text.clear()
             }
@@ -74,9 +76,9 @@ class ToDoListFragment : Fragment() {
         }
     }
 
-    private fun deleteItem(position: Int) {
-        toDoList.removeAt(position)
-        adapter.notifyItemRemoved(position)
+    private fun deleteItem(id: Int) {
+        val newList = adapter.currentList.filter { it.id != id }
+        adapter.submitList(newList)
     }
 
     private fun showEditItemDialog(item: ToDoItem) {
@@ -90,13 +92,26 @@ class ToDoListFragment : Fragment() {
     }
 
     private fun updateItem(item: ToDoItem) {
-        val position = toDoList.indexOfFirst { it.id == item.id }
-        toDoList[position] = item
-        adapter.notifyItemChanged(position)
+        val position =  adapter.currentList.indexOfFirst { it.id == item.id }
+        val newList = adapter.currentList.toMutableList()
+        newList[position] = item
+        adapter.submitList(newList)
+    }
+
+    private fun changeStatus(id: Int) {
+        val position = adapter.currentList.indexOfFirst { it.id == id }
+        val status = when (adapter.currentList[position].status) {
+            ToDoItem.Status.IN_PROGRESS -> ToDoItem.Status.COMPLETED
+            ToDoItem.Status.PENDING -> ToDoItem.Status.IN_PROGRESS
+            else -> ToDoItem.Status.COMPLETED
+        }
+        val newList = adapter.currentList.toMutableList()
+        newList[position] = newList[position].copy(status = status)
+        adapter.submitList(newList)
     }
 
     private fun swipeItems(fromPosition: Int, toPosition: Int) {
-        Collections.swap(toDoList, fromPosition, toPosition)
+        Collections.swap(adapter.currentList, fromPosition, toPosition)
         adapter.notifyItemMoved(fromPosition, toPosition)
     }
 }
