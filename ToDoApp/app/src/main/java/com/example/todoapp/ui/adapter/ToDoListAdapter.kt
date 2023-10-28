@@ -1,4 +1,4 @@
-package com.example.todoapp.adapter
+package com.example.todoapp.ui.adapter
 
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -7,8 +7,8 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
-import com.example.todoapp.Status
-import com.example.todoapp.ToDoItem
+import com.example.todoapp.models.Status
+import com.example.todoapp.models.ToDoItem
 import com.example.todoapp.databinding.ItemToDoBinding
 
 class ToDoListAdapter(

@@ -1,4 +1,4 @@
-package com.example.todoapp
+package com.example.todoapp.models
 
 import android.os.Parcelable
 import androidx.room.ColumnInfo

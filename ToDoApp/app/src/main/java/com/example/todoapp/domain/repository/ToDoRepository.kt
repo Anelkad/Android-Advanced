@@ -1,5 +1,6 @@
-package com.example.todoapp
+package com.example.todoapp.domain.repository
 
+import com.example.todoapp.models.ToDoItem
 import kotlinx.coroutines.flow.Flow
 
 interface ToDoRepository {

@@ -1,7 +1,7 @@
 package com.example.todoapp.di
 
-import com.example.todoapp.ToDoRepository
-import com.example.todoapp.ToDoRepositoryImp
+import com.example.todoapp.domain.repository.ToDoRepository
+import com.example.todoapp.data.local.repository.ToDoRepositoryImp
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

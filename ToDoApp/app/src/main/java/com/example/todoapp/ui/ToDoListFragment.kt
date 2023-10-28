@@ -1,6 +1,5 @@
-package com.example.todoapp
+package com.example.todoapp.ui
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,8 +10,10 @@ import com.example.todoapp.databinding.FragmentToDoListBinding
 import java.util.Collections
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import com.example.todoapp.adapter.ItemMoveCallback
-import com.example.todoapp.adapter.ToDoListAdapter
+import com.example.todoapp.models.Status
+import com.example.todoapp.models.ToDoItem
+import com.example.todoapp.ui.adapter.ItemMoveCallback
+import com.example.todoapp.ui.adapter.ToDoListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

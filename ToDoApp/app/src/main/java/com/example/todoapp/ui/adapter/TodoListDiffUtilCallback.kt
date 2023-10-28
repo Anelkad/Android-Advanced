@@ -1,7 +1,7 @@
-package com.example.todoapp.adapter
+package com.example.todoapp.ui.adapter
 
 import androidx.recyclerview.widget.DiffUtil
-import com.example.todoapp.ToDoItem
+import com.example.todoapp.models.ToDoItem
 
 class ToDoListDiffUtilCallback : DiffUtil.ItemCallback<ToDoItem>() {
 

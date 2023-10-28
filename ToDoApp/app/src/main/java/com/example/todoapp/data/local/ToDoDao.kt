@@ -1,9 +1,11 @@
-package com.example.todoapp
+package com.example.todoapp.data.local
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.example.todoapp.models.Status
+import com.example.todoapp.models.ToDoItem
 import kotlinx.coroutines.flow.Flow
 
 @Dao
