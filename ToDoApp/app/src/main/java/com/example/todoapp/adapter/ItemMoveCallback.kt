@@ -1,4 +1,4 @@
-package com.example.todoapp
+package com.example.todoapp.adapter
 
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView

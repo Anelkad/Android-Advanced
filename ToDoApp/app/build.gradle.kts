@@ -2,6 +2,8 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-parcelize")
+    id("org.jetbrains.kotlin.kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -28,14 +30,14 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
         viewBinding = true
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 }
 
@@ -49,4 +51,29 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     implementation ("androidx.databinding:databinding-runtime:8.1.2")
+
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+    implementation  ("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
+
+    implementation( "androidx.activity:activity-ktx:1.7.0")
+    implementation ("androidx.fragment:fragment-ktx:1.5.7")
+
+    // Room components
+    implementation ("androidx.room:room-runtime:2.5.2")
+    implementation ("androidx.room:room-ktx:2.5.2")
+    kapt  ("androidx.room:room-compiler:2.5.2")
+
+    // Kotlin components
+    implementation ("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0")
+    implementation  ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation  ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+
+    //Dagger Hilt
+    implementation ("javax.inject:javax.inject:1")
+    implementation ("com.google.dagger:dagger:2.43.2")
+    kapt ("com.google.dagger:dagger-compiler:2.43.2")
+    implementation ("com.google.dagger:hilt-android:2.44")
+    kapt ("com.google.dagger:hilt-android-compiler:2.44")
+
 }

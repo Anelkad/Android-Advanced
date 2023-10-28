@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import com.example.todoapp.databinding.FragmentEditToDoItemBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class EditToDoItemFragment(
 
 ) : BottomSheetDialogFragment() {

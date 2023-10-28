@@ -8,7 +8,13 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.example.todoapp.databinding.FragmentToDoListBinding
 import java.util.Collections
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import com.example.todoapp.adapter.ItemMoveCallback
+import com.example.todoapp.adapter.ToDoListAdapter
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ToDoListFragment : Fragment() {
     companion object {
         fun newInstance() = ToDoListFragment()
@@ -18,26 +24,18 @@ class ToDoListFragment : Fragment() {
     private val binding
         get() = _binding!!
 
+
+    private val toDoViewModel: ToDoViewModel by viewModels()
+
     private val adapter: ToDoListAdapter by lazy {
         ToDoListAdapter(
             onToDoItemClicked = ::showEditItemDialog,
             deleteItem = ::deleteItem,
             changeStatus = ::changeStatus,
             swipeItems = ::swipeItems
-        ).apply {
-            submitList(toDoList)
-        }
-    }
-    private var toDoList = mutableListOf(
-        ToDoItem(
-            title = "to do 1",
-            status = ToDoItem.Status.IN_PROGRESS
-        ),
-        ToDoItem(
-            title = "to do 2",
-            status = ToDoItem.Status.PENDING
         )
-    )
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,6 +48,14 @@ class ToDoListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindViews()
+        setupObservers()
+    }
+
+    private fun setupObservers() {
+        toDoViewModel.toDoList.observe(viewLifecycleOwner, Observer { list ->
+            // Update the cached copy of the words in the adapter.
+            list?.let { adapter.submitList(it) }
+        })
     }
 
     private fun bindViews() {
@@ -58,14 +64,12 @@ class ToDoListFragment : Fragment() {
 
             btnAddToDo.setOnClickListener {
                 if (editText.text.isNotEmpty()) {
-                    val newList = adapter.currentList.toMutableList()
-                    newList.add(
+                    toDoViewModel.insert(
                         ToDoItem(
                             title = editText.text.toString(),
                             status = ToDoItem.Status.PENDING
                         )
                     )
-                    adapter.submitList(newList)
                 }
                 editText.text.clear()
             }
