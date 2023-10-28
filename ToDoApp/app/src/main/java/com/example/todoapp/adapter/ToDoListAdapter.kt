@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
+import com.example.todoapp.Status
 import com.example.todoapp.ToDoItem
 import com.example.todoapp.databinding.ItemToDoBinding
 
@@ -14,6 +15,7 @@ class ToDoListAdapter(
     private val onToDoItemClicked: (ToDoItem) -> Unit,
     private val deleteItem: (Int) -> Unit,
     private val changeStatus: (Int) -> Unit,
+    private val changeCheckboxStatus: (Int, Boolean) -> Unit,
     private val swipeItems: (Int, Int) -> Unit
 ) : ListAdapter<ToDoItem, ToDoListAdapter.ViewHolder>(ToDoListDiffUtilCallback()),
     ItemTouchHelperAdapter {
@@ -50,12 +52,8 @@ class ToDoListAdapter(
                     onToDoItemClicked.invoke(getItem(bindingAdapterPosition))
                 }
                 checkbox.setOnCheckedChangeListener { _, isChecked ->
-                    if (isChecked) {
-                        getItem(bindingAdapterPosition).status = ToDoItem.Status.COMPLETED
-                        binding.tvTitle.setTextColor(Color.GRAY)
-                    } else {
-                        getItem(bindingAdapterPosition).status = ToDoItem.Status.PENDING
-                        binding.tvTitle.setTextColor(Color.BLACK)
+                    getItem(bindingAdapterPosition).id?.let {
+                        changeCheckboxStatus.invoke(it, isChecked)
                     }
                 }
             }
@@ -63,24 +61,32 @@ class ToDoListAdapter(
 
         fun bind(toDoItem: ToDoItem) {
             when (toDoItem.status) {
-                ToDoItem.Status.IN_PROGRESS -> binding.tvTitle.setTextColor(ContextCompat.getColor(context,
-                    R.color.green
-                ))
-                ToDoItem.Status.COMPLETED -> {
+                Status.IN_PROGRESS -> {
+                    binding.tvTitle.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.green
+                        )
+                    )
+                    binding.checkbox.isChecked = false
+                }
+                Status.COMPLETED -> {
                     binding.tvTitle.setTextColor(Color.GRAY)
                     binding.checkbox.isChecked = true
                 }
-
-                ToDoItem.Status.PENDING -> binding.tvTitle.setTextColor(Color.BLACK)
+                Status.PENDING -> {
+                    binding.tvTitle.setTextColor(Color.BLACK)
+                    binding.checkbox.isChecked = false
+                }
             }
             binding.tvTitle.text = toDoItem.title
-            binding.checkbox.isChecked = toDoItem.status == ToDoItem.Status.COMPLETED
+            binding.checkbox.isChecked = toDoItem.status == Status.COMPLETED
         }
     }
 
     override fun onItemMove(fromPosition: Int, toPosition: Int) {
         if (fromPosition in currentList.indices && toPosition in currentList.indices) {
-            swipeItems(fromPosition,toPosition)
+            swipeItems(fromPosition, toPosition)
         }
     }
 }

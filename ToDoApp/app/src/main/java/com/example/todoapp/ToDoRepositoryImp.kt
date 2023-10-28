@@ -24,4 +24,14 @@ class ToDoRepositoryImp @Inject constructor(
     override suspend fun deleteItem(id: Int) {
         toDoDao.deleteItem(id)
     }
+
+    override suspend fun updateItem(toDoItem: ToDoItem) {
+        toDoItem.id?.let {
+            toDoDao.updateItem(
+                itemId = it,
+                title = toDoItem.title,
+                status = toDoItem.status
+            )
+        }
+    }
 }

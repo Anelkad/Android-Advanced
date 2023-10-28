@@ -1,5 +1,6 @@
 package com.example.todoapp
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -32,6 +33,7 @@ class ToDoListFragment : Fragment() {
             onToDoItemClicked = ::showEditItemDialog,
             deleteItem = ::deleteItem,
             changeStatus = ::changeStatus,
+            changeCheckboxStatus = ::changeCheckboxStatus,
             swipeItems = ::swipeItems
         )
     }
@@ -53,7 +55,6 @@ class ToDoListFragment : Fragment() {
 
     private fun setupObservers() {
         toDoViewModel.toDoList.observe(viewLifecycleOwner, Observer { list ->
-            // Update the cached copy of the words in the adapter.
             list?.let { adapter.submitList(it) }
         })
     }
@@ -67,7 +68,7 @@ class ToDoListFragment : Fragment() {
                     toDoViewModel.insert(
                         ToDoItem(
                             title = editText.text.toString(),
-                            status = ToDoItem.Status.PENDING
+                            status = Status.PENDING
                         )
                     )
                 }
@@ -95,22 +96,25 @@ class ToDoListFragment : Fragment() {
     }
 
     private fun updateItem(item: ToDoItem) {
-        val position =  adapter.currentList.indexOfFirst { it.id == item.id }
-        val newList = adapter.currentList.toMutableList()
-        newList[position] = item
-        adapter.submitList(newList)
+        toDoViewModel.updateItem(item)
     }
 
     private fun changeStatus(id: Int) {
         val position = adapter.currentList.indexOfFirst { it.id == id }
         val status = when (adapter.currentList[position].status) {
-            ToDoItem.Status.IN_PROGRESS -> ToDoItem.Status.COMPLETED
-            ToDoItem.Status.PENDING -> ToDoItem.Status.IN_PROGRESS
-            else -> ToDoItem.Status.COMPLETED
+            Status.IN_PROGRESS -> Status.COMPLETED
+            Status.PENDING -> Status.IN_PROGRESS
+            else -> Status.COMPLETED
         }
-        val newList = adapter.currentList.toMutableList()
-        newList[position] = newList[position].copy(status = status)
-        adapter.submitList(newList)
+        val newItem = adapter.currentList[position].copy(status = status)
+        toDoViewModel.updateItem(newItem)
+    }
+
+    private fun changeCheckboxStatus(id: Int, isChecked: Boolean) {
+        val position = adapter.currentList.indexOfFirst { it.id == id }
+        val status = if (isChecked) Status.COMPLETED else Status.PENDING
+        val newItem = adapter.currentList[position].copy(status = status)
+        toDoViewModel.updateItem(newItem)
     }
 
     private fun swipeItems(fromPosition: Int, toPosition: Int) {

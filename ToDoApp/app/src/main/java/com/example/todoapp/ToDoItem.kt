@@ -13,8 +13,7 @@ data class ToDoItem(
     @ColumnInfo(name = "title") var title: String,
     @ColumnInfo(name = "status")  var status: Status = Status.PENDING
 ): Parcelable
-{
-    enum class Status {
-        COMPLETED, IN_PROGRESS, PENDING;
-    }
+
+enum class Status {
+    COMPLETED, IN_PROGRESS, PENDING;
 }
