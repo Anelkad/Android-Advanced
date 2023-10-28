@@ -81,8 +81,7 @@ class ToDoListFragment : Fragment() {
     }
 
     private fun deleteItem(id: Int) {
-        val newList = adapter.currentList.filter { it.id != id }
-        adapter.submitList(newList)
+        toDoViewModel.deleteItem(id)
     }
 
     private fun showEditItemDialog(item: ToDoItem) {

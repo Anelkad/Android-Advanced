@@ -22,4 +22,8 @@ class ToDoViewModel @Inject constructor(
     fun insert(toDoItem: ToDoItem) = viewModelScope.launch {
         repository.insert(toDoItem)
     }
+
+    fun deleteItem(id: Int) = viewModelScope.launch {
+        repository.deleteItem(id)
+    }
 }

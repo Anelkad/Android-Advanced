@@ -20,4 +20,8 @@ class ToDoRepositoryImp @Inject constructor(
     override suspend fun insert(toDoItem: ToDoItem) {
         toDoDao.insertItem(toDoItem)
     }
+    @WorkerThread
+    override suspend fun deleteItem(id: Int) {
+        toDoDao.deleteItem(id)
+    }
 }
